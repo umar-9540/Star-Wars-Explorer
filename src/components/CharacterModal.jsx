@@ -18,6 +18,7 @@ import {
   formatPopulation,
 } from "../utils/format";
 import { getRandomImageUrl, getSpeciesColor } from "../utils/colors";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 export const CharacterModal = ({ character, onClose }) => {
   const [planet, setPlanet] = useState(null);
@@ -170,17 +171,7 @@ export const CharacterModal = ({ character, onClose }) => {
           </div>
 
           {loading ? (
-            <div className="flex justify-center py-8">
-              <div className="relative w-12 h-12">
-                <div
-                  className="absolute inset-0 bg-linear-to-r from-blue-500 to-cyan-500 rounded-full animate-spin"
-                  style={{
-                    WebkitMaskImage:
-                      "radial-gradient(circle, transparent 30%, black 70%)",
-                  }}
-                />
-              </div>
-            </div>
+            <LoadingSpinner />
           ) : planet ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
