@@ -21,7 +21,9 @@ import { getRandomImageUrl, getSpeciesColor } from "../utils/colors";
 import { LoadingSpinner } from "./LoadingSpinner";
 
 export const CharacterModal = ({ character, onClose }) => {
+  console.log(character);
   const [planet, setPlanet] = useState(null);
+  const [charSpecies, setCharSpecies] = useState("Human");
   const [loading, setLoading] = useState(true);
   const colors = getSpeciesColor(character.species[0] || null);
   const imageUrl = getRandomImageUrl(character.name);
@@ -31,7 +33,9 @@ export const CharacterModal = ({ character, onClose }) => {
       try {
         setLoading(true);
         const planetData = await swapiService.fetchPlanet(character.homeworld);
+        const species = await swapiService.fetchSpecies(character.species);
         setPlanet(planetData);
+        setCharSpecies(species.name);
       } catch (error) {
         console.error("Failed to fetch planet data:", error);
       } finally {
@@ -40,11 +44,11 @@ export const CharacterModal = ({ character, onClose }) => {
     };
 
     fetchPlanetData();
-  }, [character.homeworld]);
+  }, [character.homeworld, character.species]);
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full my-8 relative overflow-hidden">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto rounded-lg">
+      <div className="max-h-[90%] bg-white rounded-2xl shadow-2xl max-w-3xl w-full my-8 relative overflow-y-auto md:overflow-hidden">
         <button
           onClick={onClose}
           className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors z-20 bg-white/80 rounded-full p-2 hover:bg-white"
@@ -52,9 +56,9 @@ export const CharacterModal = ({ character, onClose }) => {
           <X size={24} />
         </button>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+        <div className="flex flex-col md:grid md:grid-cols-2 gap-0">
           <div
-            className={`h-96 md:h-full bg-linear-to-br ${colors.gradient} relative overflow-hidden`}
+            className={`bg-linear-to-br ${colors.gradient} relative overflow-hidden`}
           >
             <img
               src={imageUrl}
@@ -68,92 +72,78 @@ export const CharacterModal = ({ character, onClose }) => {
               </h2>
               <p className="text-white/80 flex items-center space-x-1">
                 <Zap size={16} />
-                <span>Human</span>
+                <span>{charSpecies}</span>
               </p>
             </div>
           </div>
 
-          <div className="p-8 overflow-y-auto max-h-96 md:max-h-full">
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-4">
-                  Physical Attributes
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-start justify-between pb-4 border-b border-gray-200">
-                    <div className="flex items-start space-x-3">
-                      <Ruler className="text-blue-500 mt-1" size={20} />
-                      <div>
-                        <p className="text-xs text-gray-500 font-medium">
-                          HEIGHT
-                        </p>
-                        <p className="text-lg font-bold text-gray-900">
-                          {formatHeight(character.height)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start justify-between pb-4 border-b border-gray-200">
-                    <div className="flex items-start space-x-3">
-                      <Weight className="text-emerald-500 mt-1" size={20} />
-                      <div>
-                        <p className="text-xs text-gray-500 font-medium">
-                          MASS
-                        </p>
-                        <p className="text-lg font-bold text-gray-900">
-                          {formatMass(character.mass)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start justify-between pb-4 border-b border-gray-200">
-                    <div className="flex items-start space-x-3">
-                      <User className="text-amber-500 mt-1" size={20} />
-                      <div>
-                        <p className="text-xs text-gray-500 font-medium">
-                          BIRTH YEAR
-                        </p>
-                        <p className="text-lg font-bold text-gray-900">
-                          {character.birth_year}
-                        </p>
-                      </div>
+          <div className="p-8 overflow-y-auto">
+            <div className="space-y-0">
+              <div className="space-y-4">
+                <div className="flex items-start justify-between pb-4 border-b border-gray-200">
+                  <div className="flex items-start space-x-3">
+                    <Ruler className="text-blue-500 mt-1" size={20} />
+                    <div>
+                      <p className="text-xs text-gray-500 font-medium">
+                        HEIGHT
+                      </p>
+                      <p className="text-base font-bold text-gray-900">
+                        {formatHeight(character.height)}
+                      </p>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div>
-                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-4">
-                  Career Stats
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-start justify-between pb-4 border-b border-gray-200">
-                    <div className="flex items-start space-x-3">
-                      <Film className="text-red-500 mt-1" size={20} />
-                      <div>
-                        <p className="text-xs text-gray-500 font-medium">
-                          FILM APPEARANCES
-                        </p>
-                        <p className="text-lg font-bold text-gray-900">
-                          {character.films.length}
-                        </p>
-                      </div>
+                <div className="flex items-start justify-between pb-4 border-b border-gray-200">
+                  <div className="flex items-start space-x-3">
+                    <Weight className="text-emerald-500 mt-1" size={20} />
+                    <div>
+                      <p className="text-xs text-gray-500 font-medium">MASS</p>
+                      <p className="text-base font-bold text-gray-900">
+                        {formatMass(character.mass)}
+                      </p>
                     </div>
                   </div>
+                </div>
 
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start space-x-3">
-                      <Calendar className="text-cyan-500 mt-1" size={20} />
-                      <div>
-                        <p className="text-xs text-gray-500 font-medium">
-                          DATABASE ENTRY
-                        </p>
-                        <p className="text-lg font-bold text-gray-900">
-                          {formatDate(character.created)}
-                        </p>
-                      </div>
+                <div className="flex items-start justify-between pb-4 border-b border-gray-200">
+                  <div className="flex items-start space-x-3">
+                    <User className="text-amber-500 mt-1" size={20} />
+                    <div>
+                      <p className="text-xs text-gray-500 font-medium">
+                        BIRTH YEAR
+                      </p>
+                      <p className="text-base font-bold text-gray-900">
+                        {character.birth_year}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start justify-between pb-4 border-b border-gray-200">
+                  <div className="flex items-start space-x-3">
+                    <Film className="text-red-500 mt-1" size={20} />
+                    <div>
+                      <p className="text-xs text-gray-500 font-medium">
+                        FILM APPEARANCES
+                      </p>
+                      <p className="text-base font-bold text-gray-900">
+                        {character.films.length}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start space-x-3">
+                    <Calendar className="text-cyan-500 mt-1" size={20} />
+                    <div>
+                      <p className="text-xs text-gray-500 font-medium">
+                        DATABASE ENTRY
+                      </p>
+                      <p className="text-base font-bold text-gray-900">
+                        {formatDate(character.created)}
+                      </p>
                     </div>
                   </div>
                 </div>
